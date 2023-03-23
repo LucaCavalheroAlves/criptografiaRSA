@@ -1,0 +1,98 @@
+import random
+
+print('Bem vindo ao nosso código de criptografia!')
+print('[1] - Criptografar')
+print('[2] - Decriptografar')
+decisao = input('Sua escolha: ')
+
+while decisao.isnumeric() is False or int(decisao) <1 or int(decisao) >2:
+    print(f'Atenção, as opções são [1] e [2] ')
+    decisao = input(f'''[1] - Criptografar
+[2] - Decriptografar
+Sua escolha: ''')
+decisao = int(decisao)
+
+def mdc(a,b): 
+    maior = a
+    menor = b
+    menorcopia = menor
+
+    while menor !=0:
+        menor = maior % menor
+        maior = menorcopia
+        menorcopia = menor  
+    return maior
+    
+
+def chave_publica(n):
+    while True:
+        e = random.randrange(2,n)
+        if mdc(n,e) == 1 and e !=145:
+            return e
+
+
+def chave_privada(totiente, e):
+    d = 0
+    while ((d* e) % totiente != 1):
+        d+=1
+    return d
+
+
+def cifrar(mensagem,e,n):
+    msg_cifrada = ''
+    for letra in mensagem:
+        k = (ord(letra) ** e) % n
+        msg_cifrada += chr(k)
+    return msg_cifrada
+
+
+def decifrar(mensagem,n,d):
+    msg_decifrada = ''
+    for letra in mensagem:
+        k = (ord(letra) ** d) % n
+        msg_decifrada += chr(k)
+    return msg_decifrada
+
+
+def rsa (msg):
+    
+    p = 211 
+    q = 191 
+    n = p * q #40301   
+
+    totiente = (p - 1) * (q - 1)
+
+    e = chave_publica(totiente)
+
+    print(f'Chave publica: ({e},{n})') 
+    
+    d = chave_privada(totiente,e)
+    print(f'Chave privada: ({d},{n})') 
+
+    msg = cifrar(msg,e,n)
+    print(f'Mensagem Cifrada: {msg}') 
+
+    msg = decifrar(msg,n,d)
+    print(f'Mensagem Decifrada: {msg}') 
+
+if decisao ==1: 
+    msg = input(f'Digite a mensagem a ser criptografada: ') 
+    print()
+    rsa(msg)
+
+else: 
+    
+    msg = input(f'Digite a exata mensagem que deseja descriptografar: ') 
+    n = input(f'Digite o tamanho exato do conjunto das chaves usadas: ') 
+    while n.isnumeric() is False or int(n) < 1:
+        print('Atenção!')
+        n = input(f'Digite o tamanho exato do conjunto das chaves usadas: ') 
+    n = int(n)
+
+    d = input(f'Digite a exata chave privada: ') 
+    while d.isnumeric() is False or int(d) <1:
+        print('Atenção!')
+        d = input(f'Digite a exata chave privada: ') 
+    d = int(d)
+    print()
+    print('A mensagem decriptografada é:',decifrar(msg,n,d)) 
